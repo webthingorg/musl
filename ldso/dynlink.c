@@ -1123,41 +1123,12 @@ static struct dso *load_library(const char *name, struct dso *needed_by)
 		}
 		if (fd == -1) {
 			if (!sys_path) {
-				char *prefix = 0;
-				size_t prefix_len;
-				if (ldso.name[0]=='/') {
-					char *s, *t, *z;
-					for (s=t=z=ldso.name; *s; s++)
-						if (*s=='/') z=t, t=s;
-					prefix_len = z-ldso.name;
-					if (prefix_len < PATH_MAX)
-						prefix = ldso.name;
-				}
-				if (!prefix) {
-					prefix = "";
-					prefix_len = 0;
-				}
-				char etc_ldso_path[prefix_len + 1
-					+ sizeof "/etc/ld-musl-" LDSO_ARCH ".path"];
-				snprintf(etc_ldso_path, sizeof etc_ldso_path,
-					"%.*s/etc/ld-musl-" LDSO_ARCH ".path",
-					(int)prefix_len, prefix);
-				fd = open(etc_ldso_path, O_RDONLY|O_CLOEXEC);
-				if (fd>=0) {
-					size_t n = 0;
-					if (!fstat(fd, &st)) n = st.st_size;
-					if ((sys_path = malloc(n+1)))
-						sys_path[n] = 0;
-					if (!sys_path || read_loop(fd, sys_path, n)<0) {
-						free(sys_path);
-						sys_path = "";
-					}
-					close(fd);
-				} else if (errno != ENOENT) {
-					sys_path = "";
-				}
+				asprintf(&sys_path, "%s", ldso.name);
+				char *p = strrchr(sys_path, '/');
+				if (!p)
+					return 0;
+				*p = '\0';
 			}
-			if (!sys_path) sys_path = "/lib:/usr/local/lib:/usr/lib";
 			fd = path_open(name, sys_path, buf, sizeof buf);
 		}
 		pathname = buf;

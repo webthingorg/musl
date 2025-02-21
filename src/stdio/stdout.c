@@ -14,5 +14,5 @@ hidden FILE __stdout_FILE = {
 	.close = __stdio_close,
 	.lock = -1,
 };
-FILE *const stdout = &__stdout_FILE;
+FILE *stdout = &__stdout_FILE;
 FILE *volatile __stdout_used = &__stdout_FILE;

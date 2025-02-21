@@ -13,5 +13,5 @@ hidden FILE __stdin_FILE = {
 	.close = __stdio_close,
 	.lock = -1,
 };
-FILE *const stdin = &__stdin_FILE;
+FILE *stdin = &__stdin_FILE;
 FILE *volatile __stdin_used = &__stdin_FILE;
